@@ -1,0 +1,25 @@
+services:
+  bot:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: investingapibot
+    env_file:
+      - ../.env
+    depends_on:
+      - database
+    restart: unless-stopped
+
+  database:
+    image: postgres:17-alpine
+    container_name: investingapibot_database
+    volumes:
+      - investingapibot_db_data:/var/lib/postgresql/data
+    env_file:
+      - database.env
+    ports:
+      - "127.0.0.1:5432:5432"
+
+volumes:
+  investingapibot_db_data:
+    name: docker_investingapibot_db_data

@@ -1,0 +1,60 @@
+services:
+  investapi:
+    build:
+      context: ./InvestAPI
+      dockerfile: docker/Dockerfile
+    container_name: investapi
+    env_file:
+      - ./InvestAPI/.env
+    environment:
+      - REDIS_HOST=investapi-redis
+      - REDIS_PORT=6379
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - investapi-redis
+    restart: unless-stopped
+    networks:
+      - app_net
+
+  investapi-redis:
+    image: redis:alpine
+    container_name: investapi_redis
+    restart: unless-stopped
+    networks:
+      - app_net
+
+  bot:
+    build:
+      context: ./InvestingAPIBot
+      dockerfile: docker/Dockerfile
+    container_name: investingapibot
+    env_file:
+      - ./InvestingAPIBot/.env
+    depends_on:
+      - database
+      - investapi
+    restart: unless-stopped
+    networks:
+      - app_net
+
+  database:
+    image: postgres:17-alpine
+    container_name: investingapibot_database
+    volumes:
+      - investingapibot_db_data:/var/lib/postgresql/data
+    env_file:
+      - ./InvestingAPIBot/docker/database.env
+    ports:
+      - "6432:5432"
+    restart: unless-stopped
+    networks:
+      - app_net
+
+volumes:
+  investingapibot_db_data:
+    name: docker_investingapibot_db_data
+
+networks:
+  app_net:
+    driver: bridge

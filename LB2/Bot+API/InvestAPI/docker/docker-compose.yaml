@@ -1,0 +1,21 @@
+services:
+  investapi-api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: investapi
+    env_file:
+      - ../.env
+    environment:
+      REDIS_HOST: investapi_redis
+      REDIS_PORT: 6379
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - investapi-redis
+    restart: unless-stopped
+
+  investapi-redis:
+    image: redis:alpine
+    container_name: investapi_redis
+    restart: unless-stopped
