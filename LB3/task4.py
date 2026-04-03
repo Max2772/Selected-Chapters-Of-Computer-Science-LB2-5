@@ -29,7 +29,7 @@ TEXT = (
 
 def tokenize(text: str) -> list[str]:
     """
-    Split *text* into lowercase words, stripping all non-alphabetic characters
+    Split text into lowercase words, stripping all non-alphabetic characters
     (punctuation, hyphens, etc.) from each token.
     Words separated by spaces or commas are both handled.
     No regular expressions are used.
@@ -63,7 +63,7 @@ def words_with_even_letter_count(words: list[str]) -> list[str]:
 
 def shortest_word_starting_with(words: list[str], letter: str) -> str | None:
     """
-    Find the shortest word that starts with *letter* (case-insensitive).
+    Find the shortest word that starts with letter (case-insensitive).
 
     Args:
         words  (list[str]): list of lowercase words
@@ -80,7 +80,7 @@ def shortest_word_starting_with(words: list[str], letter: str) -> str | None:
 
 def repeated_words(words: list[str]) -> list[str]:
     """
-    Return words that appear more than once in *words*, preserving first-seen
+    Return words that appear more than once in words, preserving first-seen
     order and without duplicates in the result.
 
     Args:
@@ -120,7 +120,9 @@ def run():
     # --- a) ---
     even_words = words_with_even_letter_count(words)
     print(f"Word count: {len(words)}")
-    print(f"Words with even letter count ({len(even_words)}): {' '.join(even_words)}")
+    print(f"Words with even letter count: {len(even_words)}")
+    for i, w in enumerate(even_words):
+        print(f"\t{i + 1}) {w} (length: {len(w)})")
 
     # --- b) ---
     letter = "a"
@@ -133,6 +135,8 @@ def run():
     # --- c) ---
     repeats = repeated_words(words)
     if repeats:
-        print(f"Repeated words: {' '.join(repeats)}")
+        print(f"Repeated words: {len(repeats)}")
+        for i, w in enumerate(repeats):
+            print(f"\t{i+1}) {w}")
     else:
         print("No repeated words found.")

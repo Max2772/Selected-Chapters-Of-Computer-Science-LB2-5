@@ -17,7 +17,7 @@ HEX_DIGITS = frozenset("0123456789abcdefABCDEF")
 
 def is_hex_number(s: str) -> bool:
     """
-    Check whether *s* represents a valid hexadecimal integer.
+    Check whether s represents a valid hexadecimal integer.
 
     Accepts an optional leading '0x' or '0X' prefix.
     An empty string (or a string containing only the prefix) returns False.

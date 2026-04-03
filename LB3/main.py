@@ -1,5 +1,5 @@
 """
-Toolbox containing various tasks that operate on strings and numbers.
+A collection of tasks for working with strings and numbers.
 
 Subject: IGI
 Lab Work: 3

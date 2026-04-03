@@ -3,6 +3,7 @@ Task 1: Compute ln(1+x) via power series expansion.
 
 Subject: IGI
 Lab Work: 3
+Variant: 3
 Version: 1.0
 Author: Bibikau M.A.
 Date: 27.03.2025
@@ -17,12 +18,12 @@ NANO_EPS = 1e-9
 
 def series_terms(x: float):
     """
-    Generator of successive terms of the series for ln(x+1).
+    Generator of successive terms of the series for ln(1+x).
 
     The n-th term equals (-1)^(n+1) * x^n / n.
 
     Args:
-        x (float): argument, must satisfy |x| > 1
+        x (float): argument, must satisfy x in (-1, 1]
     """
     n = 1
     x_power = x

@@ -20,7 +20,7 @@ import ui
 
 def max_abs_element(lst: list[float]) -> float:
     """
-    Return the element of *lst* that has the greatest absolute value.
+    Return the element of lst that has the greatest absolute value.
 
     Args:
         lst (list[float]): non-empty list of numbers
@@ -34,7 +34,7 @@ def max_abs_element(lst: list[float]) -> float:
 def sum_before_last_positive(lst: list[float]) -> float:
     """
     Compute the sum of all elements that appear BEFORE the last positive
-    element in *lst*.  Returns 0 if there is no positive element, or if
+    element in lst.  Returns 0 if there is no positive element, or if
     the last positive element is at index 0.
 
     Args:
