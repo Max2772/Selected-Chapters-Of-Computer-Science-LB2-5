@@ -1,0 +1,6 @@
+Alice: alice@mail.com
+Bob <bob@example.org>
+Formula: 123$v_(ac)$bf$v_(1)$.
+Is it interesting? It is indeed! I ignored it.
+The cat sat on the mat. The cat is fat.
+Hello :--))) and bye ;[[ and invalid: ; or ]
