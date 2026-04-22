@@ -1,6 +1,6 @@
 """
 Task 6: Pandas analysis of the Boston Housing dataset.
-        Dataset: Boston Housing (https://www.kaggle.com/datasets/altavish/boston-housing-dataset/data)
+Dataset: Boston Housing (https://www.kaggle.com/datasets/altavish/boston-housing-dataset/data)
 
 Subject: IGI
 Lab Work: 4
@@ -29,20 +29,20 @@ def display(obj):
 
 
 def task_a(df: pd.DataFrame):
-    """A. Series и DataFrame — создание, индексирование, display."""
+    """A. Series and DataFrame — creation, indexing, display."""
 
     print("\n" + "═" * 55)
     print("TASK A — Series & DataFrame")
     print("═" * 55)
 
-    # 1. Series из колонки
-    print("\n[1] Series — MEDV (первые 8 значений)")
+    # 1. Series from a column
+    print("\n[1] Series — MEDV (first 8 values)")
     medv: pd.Series = df["MEDV"]
     display(medv.head(8))
     print(f"dtype: {medv.dtype}  |  size: {medv.size}")
 
-    # 2. Series вручную
-    print("\n[2] Series создан вручную (crime_rate по районам)")
+    # 2. Manually created Series
+    print("\n[2] Manually created Series (crime_rate by districts)")
     crime_series = pd.Series(
         [0.15, 3.77, 11.58, 0.03, 8.14],
         index=["D1", "D2", "D3", "D4", "D5"],
@@ -56,8 +56,8 @@ def task_a(df: pd.DataFrame):
     print("\n[3] .loc['D2':'D4']:")
     display(crime_series.loc["D2":"D4"])
 
-    # 4. DataFrame из словаря
-    print("\n[4] DataFrame crime_stats из словаря:")
+    # 4. DataFrame from dictionary
+    print("\n[4] DataFrame crime_stats from dictionary:")
     crime_stats = pd.DataFrame({
         "district": ["D1", "D2", "D3", "D4", "D5"],
         "crime_rate": [0.15, 3.77, 11.58, 0.03, 8.14],
@@ -65,14 +65,14 @@ def task_a(df: pd.DataFrame):
     })
     display(crime_stats)
 
-    # 5. Основной DataFrame
-    print("\n[5] Первые строки датасета Boston Housing:")
+    # 5. Main DataFrame
+    print("\n[5] First rows of the Boston Housing dataset:")
     display(df.head())
     print(f"\nshape: {df.shape}  |  columns: {list(df.columns)}")
 
 
 def task_b(df: pd.DataFrame):
-    """B. Статистический анализ датафрейма."""
+    """B. Statistical analysis of the DataFrame."""
 
     print("\n" + "═" * 55)
     print("TASK B — Statistical Analysis")
@@ -81,13 +81,13 @@ def task_b(df: pd.DataFrame):
     print("\n[1] df.info():")
     df.info()
 
-    print("\n[1] Пропущенные значения по колонкам:")
+    print("\n[1] Missing values per column:")
     display(df.isnull().sum().rename("missing"))
 
     print("\n[1] df.describe():")
     display(df.describe().round(3))
 
-    print("\n[1] mean / min / max / std по каждой колонке:")
+    print("\n[1] mean / min / max / std for each column:")
     display(pd.DataFrame({
         "mean": df.mean(numeric_only=True),
         "min": df.min(numeric_only=True),
@@ -105,18 +105,18 @@ def task_b(df: pd.DataFrame):
 
     ratio = medv_at_max_nox / medv_at_min_nox
 
-    print("\n[2] Средняя цена домов (MEDV) по концентрации оксидов азота (NOX):")
+    print("\n[2] Average house price (MEDV) by nitrogen oxide concentration (NOX):")
     print(f"max NOX = {nox_max}  ->  mean MEDV = {medv_at_max_nox:.4f}")
     print(f"min NOX = {nox_min}  ->  mean MEDV = {medv_at_min_nox:.4f}")
     print(f"\n  Ratio = {ratio:.2f}")
 
     if ratio < 1:
-        print(f"(при MAX NOX цена в {1 / ratio:.2f}x НИЖЕ, чем при MIN NOX)")
+        print(f"(at MAX NOX the price is {1 / ratio:.2f}x LOWER than at MIN NOX)")
     else:
-        print(f"(при MAX NOX цена в {ratio:.2f}x выше)")
+        print(f"(at MAX NOX the price is {ratio:.2f}x higher)")
 
-    # Дополнительно: корреляционная матрица
-    print("\n[3] Топ-5 корреляций с MEDV:")
+    # Additional: correlation matrix
+    print("\n[3] Top-5 correlations with MEDV:")
     corr = df_clean.corr(numeric_only=True)["MEDV"].drop("MEDV").abs().sort_values(ascending=False)
     display(corr.head(5).round(4))
 
