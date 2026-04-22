@@ -34,12 +34,20 @@ class Trapezoid(Shape):
             h (float): height
             color (str): fill color name
         """
+        super().__init__()
         if a <= 0 or b <= 0 or h <= 0:
             raise ValueError("a, b and h must be positive.")
         self.a = a
         self.b = b
         self.h = h
         self.color_obj = Color(color)
+
+    @staticmethod
+    def validate_positive(value: float, name: str) -> float:
+        """Raise ValueError if value is not positive."""
+        if value <= 0:
+            raise ValueError(f"{name} must be positive, got {value}.")
+        return value
 
     @property
     def color(self) -> str:

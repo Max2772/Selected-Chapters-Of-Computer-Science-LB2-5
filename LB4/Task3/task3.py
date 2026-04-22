@@ -12,7 +12,7 @@ Date: 20.04.2025
 import math
 from pathlib import Path
 
-import LB3.ui as ui
+import LB4.ui as ui
 from LB4.Task3.series_calculator import SeriesCalculator
 
 

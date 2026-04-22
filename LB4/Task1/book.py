@@ -19,6 +19,10 @@ class Book:
         self.year = year
 
     @property
+    def title(self) -> str:
+        return self._title
+
+    @property
     def author(self) -> str:
         return self._author
 

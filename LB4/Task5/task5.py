@@ -11,7 +11,7 @@ Date: 20.04.2025
 
 import numpy as np
 
-import LB3.ui as ui
+import LB4.ui as ui
 
 
 def _print_matrix(a: np.ndarray):

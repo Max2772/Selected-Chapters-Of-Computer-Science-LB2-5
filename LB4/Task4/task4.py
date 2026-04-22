@@ -11,11 +11,8 @@ Date: 20.04.2025
 
 from pathlib import Path
 
-import LB3.ui as ui
+import LB4.ui as ui
 from LB4.Task4.trapezoid import Trapezoid
-
-NANO_EPS = 1e-9
-
 
 def run():
     """Read parameters, build trapezoid, show info and plot."""
@@ -23,10 +20,9 @@ def run():
 
     while True:
         try:
-            gt_zero = 0 + NANO_EPS
-            a = ui.read_float("Enter bottom base a > 0: ", min=gt_zero)
-            b = ui.read_float("Enter top base b > 0: ", min=gt_zero)
-            h = ui.read_float("Enter height h > 0: ", min=gt_zero)
+            a = Trapezoid.validate_positive(ui.read_float("Enter bottom base a > 0: "), "a")
+            b = Trapezoid.validate_positive(ui.read_float("Enter top base b > 0: "), "b")
+            h = Trapezoid.validate_positive(ui.read_float("Enter height h > 0: "), "h")
             color = ui.read_str("Enter color (e.g. blue, red): ")
             label = ui.read_str("Enter figure label: ")
 

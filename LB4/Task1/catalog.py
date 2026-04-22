@@ -33,6 +33,7 @@ class CatalogBase(ABC):
 class CSVCatalog(PrintMixin, CatalogBase):
     """CSV-backed catalog with built-in display (mixin)."""
     def __init__(self, directory: Path):
+        super().__init__()
         self.directory = directory
 
     def save(self, books: list, filename: str):
@@ -42,7 +43,7 @@ class CSVCatalog(PrintMixin, CatalogBase):
             w = csv.writer(f)
             w.writerow(["Title", "Author", "Year"])
             for b in books:
-                w.writerow([b._title, b._author, b.year])
+                w.writerow([b.title, b.author, b.year])
 
     def load(self, filename: str) -> list:
         """Read books from a CSV file."""
@@ -57,6 +58,7 @@ class CSVCatalog(PrintMixin, CatalogBase):
 class PickleCatalog(PrintMixin, CatalogBase):
     """Pickle-backed catalog with built-in display (mixin)."""
     def __init__(self, directory: Path):
+        super().__init__()
         self.directory = directory
 
     def save(self, books: list, filename: str):
