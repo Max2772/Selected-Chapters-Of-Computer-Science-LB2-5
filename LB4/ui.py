@@ -2,7 +2,6 @@ import sys
 
 
 def looped_input(func):
-
     def wrapper(*args, **kwargs):
         while True:
             try:

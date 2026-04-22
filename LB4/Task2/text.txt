@@ -1,6 +1,15 @@
 Alice: alice@mail.com
 Bob <bob@example.org>
+Carol <carol@university.edu>
 Formula: 123$v_(ac)$bf$v_(1)$.
-Is it interesting? It is indeed! I ignored it.
-The cat sat on the mat. The cat is fat.
-Hello :--))) and bye ;[[ and invalid: ; or ]
+Do you see the error? It is obvious! I ignored it. I insist on fixing it.
+The dog sat on the log. The dog is big. The cat is fat.
+Find the shortest word starting with 'i'. Is it interesting?
+Eve: eve@webmail.net
+Dave <dave@example.org>
+Look at this input. It is important to inspect it carefully.
+The fox ran over the hill. The fox is quick. The hill is tall.
+Hello :--))) and bye ;[[ and also :) and invalid: ; or ] or ;-- or :.
+Repeat: the cat and the dog and the cat sat here.
+Formula: $v_(b)$ and $v_(3)$ are variables.
+Eve and Alice met Bob. Bob ignored Eve. Alice is clever.

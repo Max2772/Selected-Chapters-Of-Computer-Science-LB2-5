@@ -25,7 +25,7 @@ class TextAnalyzer:
 
         Returns: List of (name, email) tuples.
         """
-        pattern = r'([A-Za-z][A-Za-z\s]+?)\s*[:<]\s*([\w.+-]+@[\w.-]+\.\w+)>?'
+        pattern = r'([A-Za-z][A-Za-z\s]+?)\s*[:<]\s*([\w.+-]+@[\w.-]+\.\w{2,4})>?'
         return re.findall(pattern, self.text)
 
     def replace_variable(self) -> str:
@@ -90,10 +90,7 @@ class TextAnalyzer:
             'declarative': sum(1 for s in sentences if s.endswith('.')),
             'interrogative': sum(1 for s in sentences if s.endswith('?')),
             'exclamatory': sum(1 for s in sentences if s.endswith('!')),
-            'avg_sentence_len': (
-                sum(len(re.findall(r'\b\w+\b', s)) for s in sentences)
-                / len(sentences) if sentences else 0
-            ),
+            'avg_sentence_len': (len(words_all) / len(sentences) if sentences else 0),
             'avg_word_len': (
                 sum(len(w) for w in words_all) / len(words_all)
                 if words_all else 0

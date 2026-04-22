@@ -17,6 +17,6 @@ class PrintMixin:
         """Print a labelled list of books."""
         print(f"\n{heading}:")
         if not books:
-            print("    (no books found)")
+            print("(no books found)")
         for i, b in enumerate(books, 1):
             print(f"\t{i}. {b}")

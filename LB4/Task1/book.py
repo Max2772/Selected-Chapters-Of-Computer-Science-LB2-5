@@ -16,7 +16,7 @@ class Book:
     def __init__(self, title: str, author: str, year: int):
         self._title = title
         self._author = author
-        self.year = year
+        self._year = year
 
     @property
     def title(self) -> str:

@@ -29,7 +29,8 @@ class FileManager:
 
     def write(self, filename: str, content: str):
         """Write content to filename."""
-        with open(self.directory / filename, "w", encoding="utf-8") as f:
+        path = self.directory / filename
+        with open(path, "w", encoding="utf-8") as f:
             f.write(content)
 
     def zip_file(self, source: str, archive: str) -> dict:

@@ -11,6 +11,7 @@ Date: 20.04.2025
 
 from pathlib import Path
 
+from LB4 import ui
 from LB4.Task2.file_manager import FileManager
 from LB4.Task2.text_analyzer import TextAnalyzer
 
@@ -75,22 +76,26 @@ def run():
     script_dir = Path(__file__).parent
     fm = FileManager(script_dir)
 
-    try:
-        text = fm.read("text.txt")
-    except FileNotFoundError as e:
-        print(f"\nError: {e}")
-        print("Please create 'text.txt' in the LB4/Task2 folder.")
-        return
+    while True:
+        try:
+            text = fm.read("text.txt")
+        except FileNotFoundError as e:
+            print(f"\nError: {e}")
+            print("Please create 'text.txt' in the LB4/Task2 folder.")
+            return
 
-    analyzer = TextAnalyzer(text)
-    report = _build_report(analyzer)
+        analyzer = TextAnalyzer(text)
+        report = _build_report(analyzer)
 
-    print(report)
+        print(report)
 
-    try:
-        fm.write("output.txt", report)
-        info = fm.zip_file("output.txt", "results.zip")
-        print(f"\nSaved to output.txt and archived to results.zip")
-        print(f"Archive info: {info['name']}, {info['size']} B -> {info['compress_size']} B")
-    except OSError as e:
-        print(f"\nError saving results: {e}")
+        try:
+            fm.write("output.txt", report)
+            info = fm.zip_file("output.txt", "results.zip")
+            print(f"\nSaved to output.txt and archived to results.zip")
+            print(f"Archive info: {info['name']}, {info['size']} B -> {info['compress_size']} B")
+        except OSError as e:
+            print(f"\nError saving results: {e}")
+
+        if ui.read_str("\nContinue? (y/n): ").lower() != "y":
+            break
