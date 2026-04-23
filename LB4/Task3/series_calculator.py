@@ -114,7 +114,7 @@ class SeriesCalculator:
         ax.scatter(self._x, approx, color="green", zorder=5,
                    label=f"Point (x={self._x:.3f})")
         ax.annotate(
-            f"x={self._x:.6f}\nF(x)≈{approx:.6f}\neps={self._eps:e}",
+            f"x={self._x:.3f}\nF(x)≈{approx:.6f}\neps={self._eps:.3e}",
             xy=(self._x, approx), xytext=(20, -30),
             textcoords="offset points",
             arrowprops=dict(arrowstyle="->", color="black"),

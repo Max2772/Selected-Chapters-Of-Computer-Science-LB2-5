@@ -73,12 +73,12 @@ def read_float_list(prompt):
     return val
 
 
-def show_table(iterable, header=[]):
+def show_table(iterable, header=[], indent = 10):
     for h in header:
-        print("| " + h.ljust(8), end=" ")
+        print("| " + h.ljust(indent), end=" ")
     print("|")
     for h in header:
-        print("|-" + "-" * 8, end="-")
+        print("|-" + "-" * indent, end="-")
     print("|")
 
     for row in iterable:
@@ -89,5 +89,5 @@ def show_table(iterable, header=[]):
             else:
                 str_col = str(col)
 
-            print("| " + str_col.ljust(8), end=" ")
+            print("| " + str_col.ljust(indent), end=" ")
         print("|")
