@@ -12,7 +12,6 @@ Date: 20.04.2025
 import math
 from collections import defaultdict
 from pathlib import Path
-from typing import Generator
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -27,8 +26,8 @@ class SeriesCalculator:
 
     def __init__(self, x: float, eps: float):
         self._terms: list[float] = []
-        self._x = x
-        self._eps = eps
+        self.x = x
+        self.eps = eps
 
     @property
     def x(self) -> float:
@@ -50,7 +49,7 @@ class SeriesCalculator:
             raise ValueError("eps must be positive.")
         self._eps = value
 
-    def _term_generator(self) -> Generator[float, None, None]:
+    def _term_generator(self):
         """Yield successive terms of the ln(1+x) series."""
         n = 1
         while True:
@@ -83,7 +82,7 @@ class SeriesCalculator:
         """
         data = self._terms
         if not data:
-            raise ValueError("No terms yet — call calculate() first.")
+            raise ValueError("No terms, call calculate() first.")
 
         n = len(data)
         mean = sum(data) / n
@@ -111,16 +110,15 @@ class SeriesCalculator:
 
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.plot(xs, y_exact, color="blue", label="math.log(1+x) — exact")
-        ax.plot(xs, y_series, color="red", linestyle="--",
-                label=f"Series ({n} terms)")
-        ax.scatter([self._x], [approx], color="green", zorder=5,
+        ax.plot(xs, y_series, color="red", linestyle="--", label=f"Series ({n} terms)")
+        ax.scatter(self._x, approx, color="green", zorder=5,
                    label=f"Point (x={self._x:.3f})")
         ax.annotate(
-            f"x={self._x:.3f}\nF(x)≈{approx:.6f}\neps={self._eps:.0e}",
+            f"x={self._x:.6f}\nF(x)≈{approx:.6f}\neps={self._eps:e}",
             xy=(self._x, approx), xytext=(20, -30),
             textcoords="offset points",
             arrowprops=dict(arrowstyle="->", color="black"),
-            fontsize=9,
+            fontsize=9
         )
         ax.axhline(0, color="black", linewidth=0.6)
         ax.axvline(0, color="black", linewidth=0.6)
@@ -132,7 +130,7 @@ class SeriesCalculator:
 
         path = save_dir / "plot.png"
         fig.savefig(path)
-        print(f"\nPlot saved → {path}")
+        print(f"\nPlot saved: {path}")
         plt.show()
 
     def __str__(self) -> str:

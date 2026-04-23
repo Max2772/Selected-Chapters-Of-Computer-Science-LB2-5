@@ -38,15 +38,14 @@ def run():
             print("\n[Statistics of series terms]")
             print(f"Mean:     {st['mean']:.6f}")
             print(f"Median:   {st['median']:.6f}")
-            print(f"Mode:     {', '.join(f'{v:.4f}' for v in st['mode'][:3])}"
-                  f"{'…' if len(st['mode']) > 3 else ''}")
+            print(f"Mode:     {', '.join(f'{v:.6f}' for v in st['mode'])}")
             print(f"Variance: {st['variance']:.6f}")
             print(f"Std dev:  {st['std']:.6f}")
 
             calc.plot(approx, save_dir)
 
-        except ValueError as exc:
-            print(f"Error: {exc}")
+        except ValueError as ex:
+            print(f"Error: {ex}")
 
         if ui.read_str("\nContinue? (y/n): ").lower() != "y":
             break
