@@ -20,9 +20,9 @@ def run():
 
     while True:
         try:
-            a = Trapezoid.validate_positive(ui.read_float("Enter bottom base a > 0: "), "a")
-            b = Trapezoid.validate_positive(ui.read_float("Enter top base b > 0: "), "b")
-            h = Trapezoid.validate_positive(ui.read_float("Enter height h > 0: "), "h")
+            a = ui.read_float("Enter bottom base a > 0: ", min=0.0)
+            b = ui.read_float("Enter top base b > 0: ", min=0.0)
+            h = ui.read_float("Enter height h > 0: ", min=0.0)
             color = ui.read_str("Enter color (e.g. blue, red): ")
             label = ui.read_str("Enter figure label: ")
 

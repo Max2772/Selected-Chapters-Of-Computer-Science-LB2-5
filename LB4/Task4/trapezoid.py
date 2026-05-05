@@ -42,13 +42,6 @@ class Trapezoid(Shape):
         self.h = h
         self.color_obj = Color(color)
 
-    @staticmethod
-    def validate_positive(value: float, name: str) -> float:
-        """Raise ValueError if value is not positive."""
-        if value <= 0:
-            raise ValueError(f"{name} must be positive, got {value}.")
-        return value
-
     @property
     def color(self) -> str:
         return self.color_obj.color
@@ -103,8 +96,6 @@ class Trapezoid(Shape):
             save_dir (Path): directory for the output image
         """
         verts = self._vertices()
-        xs = [v[0] for v in verts]
-        ys = [v[1] for v in verts]
 
         fig, ax = plt.subplots(figsize=(7, 5))
         polygon = plt.Polygon(verts, closed=True,
@@ -114,7 +105,7 @@ class Trapezoid(Shape):
         # dimension annotations
         ax.annotate("", xy=(self.a / 2, -0.3), xytext=(-self.a / 2, -0.3),
                     arrowprops=dict(arrowstyle="<->", color="gray"))
-        ax.text(0, -0.5, f"a = {self.a}", ha="center", fontsize=9, color="gray")
+        ax.text(0, -1, f"a = {self.a}", ha="center", fontsize=9, color="gray")
 
         ax.annotate("", xy=(self.b / 2, self.h + 0.3),
                     xytext=(-self.b / 2, self.h + 0.3),
