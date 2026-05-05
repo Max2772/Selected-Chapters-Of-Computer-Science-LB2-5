@@ -115,7 +115,7 @@ def task_b(df: pd.DataFrame):
     else:
         print(f"(at MAX NOX the price is {ratio:.2f}x higher)")
 
-    # Additional: correlation matrix
+    # Correlation matrix
     print("\n[3] Top-5 correlations with MEDV:")
     corr = df_clean.corr(numeric_only=True)["MEDV"].drop("MEDV").abs().sort_values(ascending=False)
     display(corr.head(5).round(4))

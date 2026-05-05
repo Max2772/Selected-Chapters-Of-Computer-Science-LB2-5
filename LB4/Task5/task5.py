@@ -23,7 +23,7 @@ def _print_matrix(a: np.ndarray):
 
 
 def _stats_block(label: str, data: np.ndarray):
-    """Print mean / median / var / std for *data*."""
+    """Print mean / median / var / std for data."""
     print(f"[{label}]")
     print(f"mean   = {np.mean(data):.4f}")
     print(f"median = {np.median(data):.4f}")
@@ -33,8 +33,6 @@ def _stats_block(label: str, data: np.ndarray):
 
 def _analyze(a: np.ndarray):
     """Run all required analyses on matrix a."""
-
-    n, m = a.shape
 
     # 1. Row sums -> minimum
     row_sums = a.sum(axis=1)
@@ -58,7 +56,6 @@ def _analyze(a: np.ndarray):
     print("Elements with odd flat indices:", odd_vals)
 
     # 3. Statistics for each group
-    print()
     _stats_block("even-index elements", even_vals)
     _stats_block("odd-index  elements", odd_vals)
 
@@ -85,9 +82,9 @@ def run():
             print("\nGenerated matrix A[{},{}]:".format(n, m))
             _print_matrix(a)
 
-            print("zeros({0},{0}):".format(min(n, m)), np.zeros((min(n, m), min(n, m)), dtype=int))
-            print("arange slice a[0, :]:  ", a[0, :])
-            print("universal ufunc abs(-a[0]):  ", np.abs(-a[0]))
+            print("Zeros({0},{0}):".format(min(n, m)), np.zeros((min(n, m), min(n, m)), dtype=int))
+            print("Arrange slice a[0, :]:  ", a[0, :])
+            print("Universal ufunc abs(-a[0]):  ", np.abs(-a[0]))
 
             _analyze(a)
 
