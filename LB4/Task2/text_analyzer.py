@@ -10,10 +10,23 @@ Date: 20.04.2025
 """
 
 import re
+from abc import abstractmethod, ABC
 from collections import defaultdict
 
 
-class TextAnalyzer:
+class AnalyzerBase(ABC):
+    """Abstract base for text analyzers."""
+
+    @abstractmethod
+    def find_emails(self) -> list:
+        pass
+
+    @abstractmethod
+    def count_smileys(self) -> int:
+        pass
+
+
+class TextAnalyzer(AnalyzerBase):
     """Analyses text using regular expressions."""
 
     def __init__(self, text: str):

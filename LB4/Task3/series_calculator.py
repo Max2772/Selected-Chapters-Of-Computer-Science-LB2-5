@@ -10,6 +10,7 @@ Date: 20.04.2025
 """
 
 import math
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from pathlib import Path
 
@@ -17,7 +18,19 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-class SeriesCalculator:
+class CalculatorBase(ABC):
+    """Abstract base for series calculators."""
+
+    @abstractmethod
+    def calculate(self) -> tuple:
+        pass
+
+    @abstractmethod
+    def statistics(self) -> dict:
+        pass
+
+
+class SeriesCalculator(CalculatorBase):
     """
     Calculates ln(1+x) via power series and computes sequence statistics.
     """

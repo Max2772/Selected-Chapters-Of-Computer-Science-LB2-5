@@ -10,10 +10,23 @@ Date: 20.04.2025
 """
 
 import zipfile
+from abc import abstractmethod, ABC
 from pathlib import Path
 
 
-class FileManager:
+class FileHandlerBase(ABC):
+    """Abstract base for file handlers."""
+
+    @abstractmethod
+    def read(self, filename: str) -> str:
+        pass
+
+    @abstractmethod
+    def write(self, filename: str, content: str):
+        pass
+
+
+class FileManager(FileHandlerBase):
     """Handles reading, writing and zipping files."""
 
     def __init__(self, directory: Path):
