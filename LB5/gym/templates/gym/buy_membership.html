@@ -1,0 +1,151 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Покупка абонемента - FitLife Gym{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'main' %}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'memberships' %}">Абонементы</a></li>
+        <li class="breadcrumb-item active">Покупка</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4">Покупка абонемента</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">{{ membership.name }}</h5>
+            </div>
+            <div class="card-body">
+                <h3 class="text-center mb-3">{{ membership.price }} BYN</h3>
+                <p class="text-center text-muted">{{ membership.duration_days }} дней</p>
+                <p>{{ membership.description }}</p>
+                <ul class="list-unstyled">
+                    {% if membership.includes_pool %}
+                    <li>✓ Доступ к бассейну</li>
+                    {% endif %}
+                    {% if membership.includes_group_classes %}
+                    <li>✓ Групповые занятия</li>
+                    {% endif %}
+                    {% if membership.includes_personal_trainer %}
+                    <li>✓ Персональный тренер</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Оформление покупки</h5>
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Дата начала действия</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required min="{{ today|date:'Y-m-d' }}">
+                        <small class="form-text text-muted">Абонемент будет активен с выбранной даты</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="promocode" class="form-label">Промокод (необязательно)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="promocode" name="promocode" placeholder="Введите промокод">
+                            <button class="btn btn-outline-secondary" type="button" onclick="applyPromocode()">Применить</button>
+                        </div>
+                        <div id="promocode-message" class="mt-2"></div>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6>Итого к оплате:</h6>
+                            <h3 id="total-price">{{ membership.price }} BYN</h3>
+                            <div id="discount-info" class="text-success" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Способ оплаты</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="card" value="card" checked>
+                            <label class="form-check-label" for="card">
+                                Банковская карта
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="cash" value="cash">
+                            <label class="form-check-label" for="cash">
+                                Наличные (оплата на ресепшн)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="agree" name="agree" required>
+                        <label class="form-check-label" for="agree">
+                            Я согласен с <a href="{% url 'privacy_policy' %}" target="_blank">политикой конфиденциальности</a> и условиями использования
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg">Оплатить</button>
+                    <a href="{% url 'memberships' %}" class="btn btn-secondary btn-lg">Отмена</a>
+                </form>
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-3">
+            <h6>Важная информация:</h6>
+            <ul class="mb-0">
+                <li>После оплаты абонемент будет активирован автоматически</li>
+                <li>Вы получите подтверждение на email</li>
+                <li>Абонемент можно заморозить на срок до 30 дней</li>
+                <li>Возврат возможен в течение 14 дней при условии неактивации</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let originalPrice = {{ membership.price }};
+    let discountPercent = 0;
+
+    function applyPromocode() {
+        const promocode = document.getElementById('promocode').value;
+        const messageDiv = document.getElementById('promocode-message');
+
+        if (!promocode) {
+            messageDiv.innerHTML = '<div class="alert alert-warning">Введите промокод</div>';
+            return;
+        }
+
+        // Simulate promocode validation (in real app, this would be an AJAX call)
+        // For demo purposes, accept "WELCOME10" for 10% discount
+        if (promocode.toUpperCase() === 'WELCOME10') {
+            discountPercent = 10;
+            const discount = originalPrice * 0.1;
+            const newPrice = originalPrice - discount;
+
+            document.getElementById('total-price').textContent = newPrice.toFixed(2) + ' BYN';
+            document.getElementById('discount-info').style.display = 'block';
+            document.getElementById('discount-info').textContent = 'Скидка 10%: -' + discount.toFixed(2) + ' BYN';
+            messageDiv.innerHTML = '<div class="alert alert-success">Промокод применен!</div>';
+        } else {
+            messageDiv.innerHTML = '<div class="alert alert-danger">Неверный промокод</div>';
+        }
+    }
+
+    // Set minimum date to today
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('start_date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+        dateInput.value = today;
+    });
+</script>
+{% endblock %}

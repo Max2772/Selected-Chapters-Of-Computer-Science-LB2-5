@@ -1,0 +1,46 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Абонементы - FitLife Gym{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Типы абонементов</h1>
+
+<div class="row">
+    {% for membership in memberships %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white text-center">
+                <h4>{{ membership.name }}</h4>
+            </div>
+            <div class="card-body">
+                <h2 class="text-center mb-3">{{ membership.price }} BYN</h2>
+                <p class="text-center text-muted">{{ membership.duration_days }} дней</p>
+                <p class="card-text">{{ membership.description }}</p>
+                <ul class="list-unstyled">
+                    {% if membership.includes_pool %}
+                    <li>✓ Доступ к бассейну</li>
+                    {% endif %}
+                    {% if membership.includes_group_classes %}
+                    <li>✓ Групповые занятия</li>
+                    {% endif %}
+                    {% if membership.includes_personal_trainer %}
+                    <li>✓ Персональный тренер</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="card-footer text-center">
+                {% if user.is_authenticated %}
+                <a href="{% url 'buy_membership' membership.id %}" class="btn btn-success">Купить</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary">Войти для покупки</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">Абонементы не найдены</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

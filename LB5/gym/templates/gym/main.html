@@ -1,0 +1,82 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Главная - FitLife Gym{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Добро пожаловать в FitLife Gym!</h1>
+    <p class="lead">Ваш путь к здоровью, силе и красоте начинается здесь</p>
+    <hr class="my-4">
+    <p>Современное оборудование, профессиональные тренеры и индивидуальный подход к каждому клиенту</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'memberships' %}" role="button">Купить абонемент</a>
+    <a class="btn btn-outline-primary btn-lg" href="{% url 'trainings' %}" role="button">Наши тренировки</a>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>🏋️</h3>
+                <h5 class="card-title">Современное оборудование</h5>
+                <p class="card-text">Новейшие тренажеры от ведущих производителей</p>
+                <a href="{% url 'equipment' %}" class="btn btn-sm btn-outline-primary">Подробнее</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>👨‍🏫</h3>
+                <h5 class="card-title">Профессиональные тренеры</h5>
+                <p class="card-text">Опытные специалисты с международными сертификатами</p>
+                <a href="{% url 'trainers' %}" class="btn btn-sm btn-outline-primary">Наши тренеры</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>📅</h3>
+                <h5 class="card-title">Гибкое расписание</h5>
+                <p class="card-text">Групповые и индивидуальные тренировки в удобное время</p>
+                <a href="{% url 'trainings' %}" class="btn btn-sm btn-outline-primary">Расписание</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if latest_training %}
+<div class="mt-5">
+    <h2>Новая тренировка</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ latest_training.name }}</h5>
+            <p class="card-text">{{ latest_training.description|truncatewords:30 }}</p>
+            <a href="{% url 'training_detail' latest_training.pk %}" class="btn btn-primary">Подробнее</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if articles %}
+<div class="mt-5">
+    <h2>Последние новости</h2>
+    <div class="row">
+        {% for article in articles %}
+        <div class="col-md-4">
+            <div class="card mb-3">
+                {% if article.image %}
+                <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ article.title }}</h5>
+                    <p class="card-text">{{ article.short_description }}</p>
+                    <a href="{% url 'news_detail' article.pk %}" class="btn btn-sm btn-primary">Читать</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

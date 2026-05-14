@@ -1,0 +1,92 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Тренировки - FitLife Gym{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Наши тренировки</h1>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="type" class="form-label">Тип тренировки</label>
+                <select name="type" id="type" class="form-select">
+                    <option value="">Все типы</option>
+                    <option value="cardio" {% if request.GET.type == 'cardio' %}selected{% endif %}>Кардио</option>
+                    <option value="strength" {% if request.GET.type == 'strength' %}selected{% endif %}>Силовая</option>
+                    <option value="yoga" {% if request.GET.type == 'yoga' %}selected{% endif %}>Йога</option>
+                    <option value="group" {% if request.GET.type == 'group' %}selected{% endif %}>Групповая</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="difficulty" class="form-label">Сложность</label>
+                <select name="difficulty" id="difficulty" class="form-select">
+                    <option value="">Любая</option>
+                    <option value="beginner" {% if request.GET.difficulty == 'beginner' %}selected{% endif %}>Начальный</option>
+                    <option value="intermediate" {% if request.GET.difficulty == 'intermediate' %}selected{% endif %}>Средний</option>
+                    <option value="advanced" {% if request.GET.difficulty == 'advanced' %}selected{% endif %}>Продвинутый</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary d-block w-100">Фильтровать</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% for training in trainings %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ training.name }}</h5>
+                <p class="card-text">{{ training.description|truncatewords:20 }}</p>
+                <p class="card-text">
+                    <small class="text-muted">
+                        Тип: {{ training.get_type_display }}<br>
+                        Сложность: {{ training.get_difficulty_display }}<br>
+                        Длительность: {{ training.duration }} мин<br>
+                        Цена: {{ training.price }} BYN
+                    </small>
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'training_detail' training.id %}" class="btn btn-primary btn-sm">Подробнее</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'book_training' training.id %}" class="btn btn-success btn-sm">Записаться</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">Тренировки не найдены</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

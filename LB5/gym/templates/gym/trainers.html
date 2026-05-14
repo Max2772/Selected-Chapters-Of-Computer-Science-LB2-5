@@ -1,0 +1,64 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Тренеры - FitLife Gym{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Наши тренеры</h1>
+
+<div class="row">
+    {% for trainer in trainers %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            {% if trainer.photo %}
+            <img src="{{ trainer.photo.url }}" class="card-img-top" alt="{{ trainer.user.get_full_name }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ trainer.user.get_full_name }}</h5>
+                <p class="card-text">{{ trainer.bio|truncatewords:30 }}</p>
+                <p class="card-text">
+                    <small class="text-muted">
+                        Специализация: {{ trainer.specialization }}<br>
+                        Опыт: {{ trainer.experience }} лет<br>
+                        Рейтинг: {{ trainer.rating|floatformat:1 }}/5.0
+                    </small>
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'trainer_detail' trainer.id %}" class="btn btn-primary btn-sm">Подробнее</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'select_trainer' trainer.id %}" class="btn btn-success btn-sm">Выбрать</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">Тренеры не найдены</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

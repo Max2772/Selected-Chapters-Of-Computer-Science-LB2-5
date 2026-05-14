@@ -1,0 +1,103 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Добавить отзыв - FitLife Gym{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'main' %}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'reviews' %}">Отзывы</a></li>
+        <li class="breadcrumb-item active">Добавить отзыв</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4">Оставить отзыв</h1>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Оценка</label>
+                        <div class="rating-input">
+                            <input type="radio" name="rating" id="star5" value="5" required>
+                            <label for="star5" title="5 звезд">★</label>
+                            <input type="radio" name="rating" id="star4" value="4">
+                            <label for="star4" title="4 звезды">★</label>
+                            <input type="radio" name="rating" id="star3" value="3">
+                            <label for="star3" title="3 звезды">★</label>
+                            <input type="radio" name="rating" id="star2" value="2">
+                            <label for="star2" title="2 звезды">★</label>
+                            <input type="radio" name="rating" id="star1" value="1">
+                            <label for="star1" title="1 звезда">★</label>
+                        </div>
+                        <small class="form-text text-muted">Выберите количество звезд</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="trainer" class="form-label">Тренер (необязательно)</label>
+                        <select class="form-select" id="trainer" name="trainer">
+                            <option value="">Общий отзыв о зале</option>
+                            {% for trainer in trainers %}
+                            <option value="{{ trainer.id }}">{{ trainer.user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Ваш отзыв</label>
+                        <textarea class="form-control" id="text" name="text" rows="6" required placeholder="Расскажите о вашем опыте посещения нашего фитнес-центра..."></textarea>
+                        <small class="form-text text-muted">Минимум 20 символов</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="anonymous" name="anonymous">
+                            <label class="form-check-label" for="anonymous">
+                                Опубликовать анонимно
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Обратите внимание:</strong> Отзывы проходят модерацию перед публикацией. Мы оставляем за собой право не публиковать отзывы, содержащие ненормативную лексику или оскорбления.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">Отправить отзыв</button>
+                    <a href="{% url 'reviews' %}" class="btn btn-secondary btn-lg">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rating-input {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        font-size: 2rem;
+    }
+
+    .rating-input input {
+        display: none;
+    }
+
+    .rating-input label {
+        color: #ddd;
+        cursor: pointer;
+        padding: 0 5px;
+    }
+
+    .rating-input label:hover,
+    .rating-input label:hover ~ label,
+    .rating-input input:checked ~ label {
+        color: #ffc107;
+    }
+</style>
+{% endblock %}
