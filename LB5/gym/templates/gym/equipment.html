@@ -79,12 +79,14 @@
         font-size: 0.95rem;
         display: flex;
         align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
     .equipment-info p i {
         color: var(--primary-color);
-        margin-right: 10px;
         width: 20px;
+        flex-shrink: 0;
     }
 
     .equipment-info strong {
@@ -98,6 +100,12 @@
         border-radius: 20px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .badge.bg-success {
