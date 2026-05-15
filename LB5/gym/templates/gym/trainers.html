@@ -205,11 +205,6 @@
                     <a href="{% url 'trainer_detail' trainer.id %}" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-info-circle"></i> Подробнее
                     </a>
-                    {% if user.is_authenticated %}
-                    <a href="{% url 'select_trainer' trainer.id %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-check"></i> Выбрать
-                    </a>
-                    {% endif %}
                 </div>
             </div>
         </div>

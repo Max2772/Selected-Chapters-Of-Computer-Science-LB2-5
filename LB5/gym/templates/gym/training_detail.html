@@ -118,13 +118,15 @@
                 </div>
                 {% endif %}
 
-                {% if training.trainer %}
+                {% if training.trainers.exists %}
                 <div class="mb-3">
-                    <strong>Тренер:</strong>
+                    <strong>Тренеры:</strong>
                     <p class="mb-0">
-                        <a href="{% url 'trainer_detail' training.trainer.id %}">
-                            {{ training.trainer.user.get_full_name }}
-                        </a>
+                        {% for trainer in training.trainers.all %}
+                        <a href="{% url 'trainer_detail' trainer.id %}">
+                            {{ trainer.first_name }} {{ trainer.last_name }}
+                        </a>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
                     </p>
                 </div>
                 {% endif %}

@@ -261,15 +261,6 @@
                 <div class="profile-info">
                     <p><strong><i class="fas fa-user"></i> Имя:</strong> {{ user.client.first_name }} {{ user.client.last_name }}</p>
                     <p><strong><i class="fas fa-phone"></i> Телефон:</strong> {{ user.client.phone }}</p>
-                    {% if user.client.trainer %}
-                    <p><strong><i class="fas fa-user-tie"></i> Тренер:</strong> {{ user.client.trainer }}</p>
-                    {% else %}
-                    <p class="text-center mt-3">
-                        <a href="{% url 'select_trainer' %}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus"></i> Выбрать тренера
-                        </a>
-                    </p>
-                    {% endif %}
                 </div>
                 {% endif %}
             </div>
@@ -353,7 +344,7 @@
                         {% for training in trainings %}
                         <li class="list-group-item">
                             <strong><i class="fas fa-dumbbell"></i> {{ training.training_type }}</strong><br>
-                            <i class="fas fa-user-tie"></i> Тренер: {{ training.trainer }}<br>
+                            <i class="fas fa-user-tie"></i> Тренеры: {% for trainer in training.trainers.all %}{{ trainer }}{% if not forloop.last %}, {% endif %}{% endfor %}<br>
                             <i class="fas fa-calendar"></i> Дата: {{ training.date|date:"d.m.Y" }} в {{ training.time }}
                         </li>
                         {% endfor %}

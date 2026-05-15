@@ -49,8 +49,6 @@ class Client(models.Model):
     address = models.CharField(max_length=255, verbose_name="Адрес")
     phone = models.CharField(max_length=20, verbose_name="Телефон")
     birth_date = models.DateField(verbose_name="Дата рождения")
-    trainer = models.ForeignKey(Trainer, on_delete=models.SET_NULL, null=True, blank=True,
-                                related_name='clients', verbose_name="Персональный тренер")
     registration_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата регистрации")
 
     def __str__(self):
@@ -112,9 +110,25 @@ class TrainingType(models.Model):
         verbose_name_plural = "Типы тренировок"
 
 
+class Hall(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    area = models.PositiveIntegerField(verbose_name="Площадь (кв.м)")
+    capacity = models.PositiveIntegerField(verbose_name="Вместимость (человек)")
+    description = models.TextField(verbose_name="Описание", blank=True)
+    image = models.ImageField(upload_to='hall_images/', blank=True, null=True, verbose_name="Изображение")
+
+    def __str__(self):
+        return f"{self.name} ({self.capacity} чел.)"
+
+    class Meta:
+        verbose_name = "Зал"
+        verbose_name_plural = "Залы"
+
+
 class Training(models.Model):
     training_type = models.ForeignKey(TrainingType, on_delete=models.CASCADE, verbose_name="Тип тренировки")
-    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, verbose_name="Тренер")
+    trainers = models.ManyToManyField(Trainer, related_name='trainings', verbose_name="Тренеры")
+    hall = models.ForeignKey(Hall, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Зал")
     date = models.DateField(verbose_name="Дата")
     time = models.TimeField(verbose_name="Время")
     participants = models.ManyToManyField(Client, blank=True, related_name='trainings', verbose_name="Участники")
@@ -141,6 +155,8 @@ class Equipment(models.Model):
         ('needs_repair', 'Требует ремонта')
     ], verbose_name="Состояние")
     purchase_date = models.DateField(verbose_name="Дата покупки")
+    hall = models.ForeignKey(Hall, on_delete=models.SET_NULL, null=True, blank=True,
+                            related_name='equipment', verbose_name="Зал")
     image = models.ImageField(upload_to='equipment_images/', blank=True, null=True, verbose_name="Изображение")
 
     def __str__(self):

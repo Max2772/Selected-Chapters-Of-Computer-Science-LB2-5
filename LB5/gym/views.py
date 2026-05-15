@@ -18,7 +18,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 
 from .forms import (
-    RegisterForm, SelectTrainerForm, MembershipForm,
+    RegisterForm, MembershipForm,
     TrainingBookingForm, ReviewForm, PromocodeForm, TrainingForm
 )
 from .models import (
@@ -190,24 +190,6 @@ def profile_view(request):
         'trainings': trainings,
         'reviews': reviews
     })
-
-
-@login_required
-def select_trainer_view(request):
-    try:
-        client = request.user.client
-    except Client.DoesNotExist:
-        return HttpResponseForbidden("Вы не зарегистрированы как клиент.")
-
-    if request.method == 'POST':
-        form = SelectTrainerForm(request.POST, instance=client)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')
-    else:
-        form = SelectTrainerForm(instance=client)
-
-    return render(request, 'gym/select_trainer.html', {'form': form})
 
 
 @login_required
@@ -386,3 +368,79 @@ def membership_distribution_chart(request):
         graphic = None
 
     return render(request, 'gym/membership_chart.html', {'chart': graphic})
+
+
+@staff_member_required
+def training_group_report(request):
+    """Список клиентов, занимающихся в определенной группе (тренировке)"""
+    training_id = request.GET.get('training_id')
+    trainings = Training.objects.all().order_by('-date', '-time')
+
+    selected_training = None
+    participants = []
+
+    if training_id:
+        selected_training = get_object_or_404(Training, id=training_id)
+        participants = selected_training.participants.all()
+
+    return render(request, 'gym/reports/training_group.html', {
+        'trainings': trainings,
+        'selected_training': selected_training,
+        'participants': participants
+    })
+
+
+@staff_member_required
+def training_count_report(request):
+    """Подсчет количества занятий, проведенных в каждой из групп за определенный период"""
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    training_stats = []
+
+    if start_date and end_date:
+        trainings = Training.objects.filter(
+            date__gte=start_date,
+            date__lte=end_date,
+            is_cancelled=False
+        ).values('training_type__name').annotate(
+            count=Count('id'),
+            total_participants=Count('participants')
+        ).order_by('-count')
+
+        training_stats = list(trainings)
+
+    return render(request, 'gym/reports/training_count.html', {
+        'training_stats': training_stats,
+        'start_date': start_date,
+        'end_date': end_date
+    })
+
+
+@staff_member_required
+def client_cost_report(request):
+    """Определение стоимости оказанных услуг каждому клиенту за весь период"""
+    clients = Client.objects.all()
+    client_costs = []
+
+    for client in clients:
+        # Стоимость абонементов
+        memberships = Membership.objects.filter(client=client)
+        membership_cost = sum([m.membership_type.price for m in memberships])
+
+        # Количество тренировок
+        training_count = client.trainings.filter(is_cancelled=False).count()
+
+        client_costs.append({
+            'client': client,
+            'membership_cost': membership_cost,
+            'training_count': training_count,
+            'total_cost': membership_cost
+        })
+
+    # Сортировка по общей стоимости
+    client_costs.sort(key=lambda x: x['total_cost'], reverse=True)
+
+    return render(request, 'gym/reports/client_cost.html', {
+        'client_costs': client_costs
+    })

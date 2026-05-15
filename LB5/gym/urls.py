@@ -25,7 +25,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
 
     path('profile/', views.profile_view, name='profile'),
-    path('select-trainer/', views.select_trainer_view, name='select_trainer'),
     path('buy-membership/', views.buy_membership_view, name='buy_membership'),
     path('book-training/', views.book_training_view, name='book_training'),
 
@@ -38,4 +37,8 @@ urlpatterns = [
 
     path('statistics/', views.statistics_view, name='statistics'),
     path('membership-chart/', views.membership_distribution_chart, name='membership_chart'),
+
+    path('reports/training-group/', views.training_group_report, name='training_group_report'),
+    path('reports/training-count/', views.training_count_report, name='training_count_report'),
+    path('reports/client-cost/', views.client_cost_report, name='client_cost_report'),
 ]

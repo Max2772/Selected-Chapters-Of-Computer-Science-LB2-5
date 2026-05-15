@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     CompanyInfo, Trainer, Client, MembershipType, Membership,
-    TrainingType, Training, Equipment, Review, Promocode,
+    TrainingType, Training, Hall, Equipment, Review, Promocode,
     FAQ, Article, Vacancy, UserSessionLog
 )
 
@@ -20,8 +20,8 @@ class TrainerAdmin(admin.ModelAdmin):
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ['last_name', 'first_name', 'phone', 'trainer', 'registration_date']
-    list_filter = ['trainer', 'registration_date']
+    list_display = ['last_name', 'first_name', 'phone', 'registration_date']
+    list_filter = ['registration_date']
     search_fields = ['last_name', 'first_name', 'phone']
 
 
@@ -44,17 +44,28 @@ class TrainingTypeAdmin(admin.ModelAdmin):
     list_filter = ['difficulty_level']
 
 
+@admin.register(Hall)
+class HallAdmin(admin.ModelAdmin):
+    list_display = ['name', 'area', 'capacity']
+    search_fields = ['name']
+
+
 @admin.register(Training)
 class TrainingAdmin(admin.ModelAdmin):
-    list_display = ['training_type', 'trainer', 'date', 'time', 'is_cancelled']
-    list_filter = ['is_cancelled', 'date', 'trainer']
-    filter_horizontal = ['participants']
+    list_display = ['training_type', 'get_trainers', 'hall', 'date', 'time', 'is_cancelled']
+    list_filter = ['is_cancelled', 'date', 'hall']
+    filter_horizontal = ['trainers', 'participants']
+
+    def get_trainers(self, obj):
+        return ", ".join([str(trainer) for trainer in obj.trainers.all()])
+    get_trainers.short_description = 'Тренеры'
 
 
 @admin.register(Equipment)
 class EquipmentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'quantity', 'condition', 'purchase_date']
-    list_filter = ['condition']
+    list_display = ['name', 'quantity', 'condition', 'hall', 'purchase_date']
+    list_filter = ['condition', 'hall']
+    search_fields = ['name']
 
 
 @admin.register(Review)

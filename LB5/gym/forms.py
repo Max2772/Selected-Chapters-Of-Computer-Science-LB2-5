@@ -63,21 +63,6 @@ class RegisterForm(UserCreationForm):
         self.fields['patronymic'].required = False
 
 
-class SelectTrainerForm(forms.ModelForm):
-    class Meta:
-        model = Client
-        fields = ['trainer']
-        labels = {
-            'trainer': 'Выберите персонального тренера'
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['trainer'].widget.attrs.update({
-            'class': 'form-select',
-        })
-
-
 class MembershipForm(forms.ModelForm):
     promo_code_input = forms.CharField(label="Промокод", required=False, max_length=20)
 
@@ -177,14 +162,15 @@ class PromocodeForm(forms.ModelForm):
 class TrainingForm(forms.ModelForm):
     class Meta:
         model = Training
-        fields = ['training_type', 'trainer', 'date', 'time']
+        fields = ['training_type', 'trainers', 'hall', 'date', 'time']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         }
         labels = {
             'training_type': 'Тип тренировки',
-            'trainer': 'Тренер',
+            'trainers': 'Тренеры',
+            'hall': 'Зал',
             'date': 'Дата',
             'time': 'Время'
         }
@@ -192,4 +178,5 @@ class TrainingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['training_type'].widget.attrs.update({'class': 'form-select'})
-        self.fields['trainer'].widget.attrs.update({'class': 'form-select'})
+        self.fields['trainers'].widget.attrs.update({'class': 'form-select', 'multiple': 'multiple'})
+        self.fields['hall'].widget.attrs.update({'class': 'form-select'})
