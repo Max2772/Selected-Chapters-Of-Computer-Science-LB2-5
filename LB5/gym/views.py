@@ -76,7 +76,11 @@ def vacancies_view(request):
 
 def trainers_view(request):
     trainers = Trainer.objects.all()
-    return render(request, 'gym/trainers.html', {'trainers': trainers})
+    return render(
+        request,
+        'gym/trainers.html',
+        {'trainers': trainers}
+    )
 
 
 def trainer_detail_view(request, pk):

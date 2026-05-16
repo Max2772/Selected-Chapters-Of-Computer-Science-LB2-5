@@ -40,7 +40,7 @@
     }
 
     .trainer-card .card-img-top {
-        height: 350px;
+        height: 400px;
         object-fit: cover;
         transition: all 0.4s ease;
         position: relative;
@@ -55,7 +55,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 350px;
+        height: 450px;
         background: linear-gradient(to bottom, transparent 0%, rgba(10, 10, 10, 0.9) 100%);
         display: flex;
         align-items: flex-end;
@@ -176,28 +176,20 @@
         <div class="col-lg-4 col-md-6">
             <div class="trainer-card">
                 {% if trainer.photo %}
-                <img src="{{ trainer.photo.url }}" class="card-img-top" alt="{{ trainer.user.get_full_name }}">
+                <img src="{{ trainer.photo.url }}" class="card-img-top" alt="{{ trainer.first_name }} {{ trainer.last_name }}">
                 {% else %}
-                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80" class="card-img-top" alt="{{ trainer.user.get_full_name }}">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80" class="card-img-top" alt="{{ trainer.first_name }} {{ trainer.last_name }}">
                 {% endif %}
 
                 <div class="card-body">
-                    <h5 class="card-title">{{ trainer.user.get_full_name }}</h5>
-                    <p class="card-text">{{ trainer.bio|truncatewords:25 }}</p>
+                    <h5 class="card-title">{{ trainer.first_name }} {{ trainer.last_name }}</h5>
+                    <p class="card-text">{{ trainer.bio|truncatewords:25|default:"Опытный тренер с индивидуальным подходом к каждому клиенту." }}</p>
 
                     <div class="trainer-info">
                         <p><strong>Специализация:</strong> {{ trainer.specialization }}</p>
-                        <p><strong>Опыт работы:</strong> {{ trainer.experience }} лет</p>
-                        <p><strong>Рейтинг:</strong> {{ trainer.rating|floatformat:1 }}/5.0</p>
-                        <div class="rating-stars">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= trainer.rating %}
-                                    <i class="fas fa-star"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
+                        <p><strong>Опыт работы:</strong> {{ trainer.experience_years }} лет</p>
+                        <p><strong>Email:</strong> {{ trainer.email }}</p>
+                        <p><strong>Телефон:</strong> {{ trainer.phone }}</p>
                     </div>
                 </div>
 
