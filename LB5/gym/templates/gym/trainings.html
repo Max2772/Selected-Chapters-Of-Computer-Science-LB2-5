@@ -243,31 +243,29 @@
     <!-- Filter Section -->
     <div class="filter-section">
         <form method="get" class="row g-3">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label for="type" class="form-label">
                     <i class="fas fa-filter"></i> Тип тренировки
                 </label>
                 <select name="type" id="type" class="form-select">
                     <option value="">Все типы</option>
-                    <option value="cardio" {% if request.GET.type == 'cardio' %}selected{% endif %}>Кардио</option>
-                    <option value="strength" {% if request.GET.type == 'strength' %}selected{% endif %}>Силовая</option>
-                    <option value="yoga" {% if request.GET.type == 'yoga' %}selected{% endif %}>Йога</option>
-                    <option value="group" {% if request.GET.type == 'group' %}selected{% endif %}>Групповая</option>
+                    {% for value, label in type_choices %}
+                    <option value="{{ value }}" {% if type_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label for="difficulty" class="form-label">
                     <i class="fas fa-chart-line"></i> Сложность
                 </label>
                 <select name="difficulty" id="difficulty" class="form-select">
                     <option value="">Любая</option>
-                    <option value="beginner" {% if request.GET.difficulty == 'beginner' %}selected{% endif %}>Начальный</option>
-                    <option value="intermediate" {% if request.GET.difficulty == 'intermediate' %}selected{% endif %}>Средний</option>
-                    <option value="advanced" {% if request.GET.difficulty == 'advanced' %}selected{% endif %}>Продвинутый</option>
+                    {% for value, label in difficulty_choices %}
+                    <option value="{{ value }}" {% if difficulty == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">&nbsp;</label>
+            <div class="col-md-12">
                 <button type="submit" class="btn btn-primary d-block w-100">
                     <i class="fas fa-search"></i> Применить фильтры
                 </button>
@@ -294,17 +292,17 @@
                         <p>
                             <i class="fas fa-signal"></i>
                             <strong>Сложность:</strong>
-                            <span class="difficulty-badge difficulty-{{ training.difficulty }}">
-                                {{ training.get_difficulty_display }}
+                            <span class="difficulty-badge difficulty-{{ training.difficulty_level }}">
+                                {{ training.get_difficulty_level_display }}
                             </span>
                         </p>
                         <p>
                             <i class="fas fa-clock"></i>
-                            <strong>Длительность:</strong> {{ training.duration }} мин
+                            <strong>Длительность:</strong> {{ training.duration_minutes }} мин
                         </p>
                         <p>
-                            <i class="fas fa-tag"></i>
-                            <strong>Цена:</strong> {{ training.price }} BYN
+                            <i class="fas fa-users"></i>
+                            <strong>Макс. участников:</strong> {{ training.max_participants }} чел.
                         </p>
                     </div>
                 </div>
@@ -314,7 +312,7 @@
                         <i class="fas fa-info-circle"></i> Подробнее
                     </a>
                     {% if user.is_authenticated %}
-                    <a href="{% url 'book_training' training.id %}" class="btn btn-primary btn-sm">
+                    <a href="{% url 'book_training' %}" class="btn btn-primary btn-sm">
                         <i class="fas fa-calendar-check"></i> Записаться
                     </a>
                     {% endif %}

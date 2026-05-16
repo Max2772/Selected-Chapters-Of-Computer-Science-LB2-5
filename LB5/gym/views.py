@@ -89,23 +89,23 @@ def trainer_detail_view(request, pk):
 
 
 def trainings_view(request):
-    query = request.GET.get('q', '')
     difficulty = request.GET.get('difficulty', '')
+    type_filter = request.GET.get('type', '')
 
     training_types = TrainingType.objects.all()
-
-    if query:
-        training_types = training_types.filter(
-            Q(name__icontains=query) | Q(description__icontains=query)
-        )
 
     if difficulty:
         training_types = training_types.filter(difficulty_level=difficulty)
 
+    if type_filter:
+        training_types = training_types.filter(type=type_filter)
+
     return render(request, 'gym/trainings.html', {
-        'training_types': training_types,
-        'query': query,
-        'difficulty': difficulty
+        'trainings': training_types,
+        'difficulty': difficulty,
+        'type_filter': type_filter,
+        'type_choices': TrainingType.TrainingCategory.choices,
+        'difficulty_choices': TrainingType.DifficultyLevel.choices
     })
 
 

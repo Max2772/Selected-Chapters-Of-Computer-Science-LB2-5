@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils import timezone
 
 
@@ -91,15 +91,26 @@ class Membership(models.Model):
 
 
 class TrainingType(models.Model):
+
+    class TrainingCategory(models.TextChoices):
+        CARDIO = 'cardio', 'Кардио'
+        STRENGTH = 'strength', 'Силовая'
+        YOGA = 'yoga', 'Йога'
+        GROUP = 'group', 'Групповая'
+        FUNCTIONAL = 'functional', 'Функциональная'
+
+    class DifficultyLevel(models.TextChoices):
+        BEGINNER = 'beginner', 'Начинающий'
+        INTERMEDIATE = 'intermediate', 'Средний'
+        ADVANCED = 'advanced', 'Продвинутый'
+
+
     name = models.CharField(max_length=100, verbose_name="Название")
+    type = models.CharField(max_length=20, choices=TrainingCategory.choices, default='group', verbose_name="Тип")
     description = models.TextField(verbose_name="Описание")
     duration_minutes = models.PositiveIntegerField(verbose_name="Длительность (минут)")
     max_participants = models.PositiveIntegerField(verbose_name="Максимум участников")
-    difficulty_level = models.CharField(max_length=50, choices=[
-        ('beginner', 'Начинающий'),
-        ('intermediate', 'Средний'),
-        ('advanced', 'Продвинутый')
-    ], verbose_name="Уровень сложности")
+    difficulty_level = models.CharField(max_length=50, choices=DifficultyLevel.choices, verbose_name="Уровень сложности")
     image = models.ImageField(upload_to='training_images/', blank=True, null=True, verbose_name="Изображение")
 
     def __str__(self):
