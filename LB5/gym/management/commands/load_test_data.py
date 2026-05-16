@@ -1,10 +1,11 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from gym.models import (
-    CompanyInfo, Trainer, Client, MembershipType, TrainingType,
-    Equipment, FAQ, Article, Vacancy
+    CompanyInfo, Trainer, Client, MembershipType, Membership, TrainingType,
+    Equipment, FAQ, Article, Vacancy, Hall, Training, Review, Promocode
 )
-from datetime import date, timedelta
+from datetime import date, timedelta, time
+from django.utils import timezone
 
 
 class Command(BaseCommand):
@@ -261,7 +262,308 @@ class Command(BaseCommand):
                 Vacancy.objects.create(**data)
             self.stdout.write(self.style.SUCCESS('[OK] Вакансии созданы'))
 
+        # Залы
+        if not Hall.objects.exists():
+            halls_data = [
+                {
+                    'name': 'Тренажерный зал',
+                    'area': 300,
+                    'capacity': 50,
+                    'description': 'Просторный зал с современными тренажерами для силовых и кардио тренировок'
+                },
+                {
+                    'name': 'Зал групповых занятий',
+                    'area': 200,
+                    'capacity': 30,
+                    'description': 'Зал для йоги, пилатеса и других групповых программ'
+                },
+                {
+                    'name': 'Зал функционального тренинга',
+                    'area': 150,
+                    'capacity': 20,
+                    'description': 'Зал для кроссфита и HIIT тренировок'
+                }
+            ]
+            for data in halls_data:
+                Hall.objects.create(**data)
+            self.stdout.write(self.style.SUCCESS('[OK] Залы созданы'))
+
+        # Обновляем оборудование, привязывая к залам
+        if Equipment.objects.exists() and Hall.objects.exists():
+            gym_hall = Hall.objects.get(name='Тренажерный зал')
+            group_hall = Hall.objects.get(name='Зал групповых занятий')
+            functional_hall = Hall.objects.get(name='Зал функционального тренинга')
+
+            Equipment.objects.filter(name='Беговая дорожка').update(hall=gym_hall)
+            Equipment.objects.filter(name='Силовая рама').update(hall=gym_hall)
+            Equipment.objects.filter(name='Гантели').update(hall=functional_hall)
+            Equipment.objects.filter(name='Велотренажер').update(hall=gym_hall)
+            self.stdout.write(self.style.SUCCESS('[OK] Оборудование привязано к залам'))
+
+        # Клиенты
+        if Client.objects.count() < 5:
+            clients_data = [
+                {
+                    'username': 'client1',
+                    'email': 'client1@example.com',
+                    'first_name': 'Алексей',
+                    'last_name': 'Иванов',
+                    'patronymic': 'Сергеевич',
+                    'address': 'г. Минск, ул. Ленина, 10',
+                    'phone': '+375 29 444-44-44',
+                    'birth_date': date(1995, 3, 15)
+                },
+                {
+                    'username': 'client2',
+                    'email': 'client2@example.com',
+                    'first_name': 'Мария',
+                    'last_name': 'Смирнова',
+                    'patronymic': 'Александровна',
+                    'address': 'г. Минск, пр. Независимости, 25',
+                    'phone': '+375 29 555-55-55',
+                    'birth_date': date(1998, 7, 22)
+                },
+                {
+                    'username': 'client3',
+                    'email': 'client3@example.com',
+                    'first_name': 'Дмитрий',
+                    'last_name': 'Кузнецов',
+                    'patronymic': 'Владимирович',
+                    'address': 'г. Минск, ул. Богдановича, 5',
+                    'phone': '+375 29 666-66-66',
+                    'birth_date': date(1990, 11, 8)
+                },
+                {
+                    'username': 'client4',
+                    'email': 'client4@example.com',
+                    'first_name': 'Елена',
+                    'last_name': 'Волкова',
+                    'patronymic': 'Игоревна',
+                    'address': 'г. Минск, ул. Притыцкого, 15',
+                    'phone': '+375 29 777-77-77',
+                    'birth_date': date(1993, 5, 30)
+                },
+                {
+                    'username': 'client5',
+                    'email': 'client5@example.com',
+                    'first_name': 'Андрей',
+                    'last_name': 'Морозов',
+                    'patronymic': 'Петрович',
+                    'address': 'г. Минск, ул. Тимирязева, 20',
+                    'phone': '+375 29 888-88-88',
+                    'birth_date': date(1987, 9, 12)
+                }
+            ]
+            for data in clients_data:
+                username = data['username']
+                if not User.objects.filter(username=username).exists():
+                    user = User.objects.create_user(
+                        username=username,
+                        email=data['email'],
+                        password='client123'
+                    )
+                    Client.objects.create(
+                        user=user,
+                        first_name=data['first_name'],
+                        last_name=data['last_name'],
+                        patronymic=data['patronymic'],
+                        address=data['address'],
+                        phone=data['phone'],
+                        birth_date=data['birth_date']
+                    )
+            self.stdout.write(self.style.SUCCESS('[OK] Клиенты созданы'))
+
+        # Абонементы
+        if not Membership.objects.exists() and Client.objects.exists() and MembershipType.objects.exists():
+            clients = list(Client.objects.all())
+            membership_types = list(MembershipType.objects.all())
+
+            memberships_data = [
+                {
+                    'client': clients[0],
+                    'membership_type': membership_types[2],  # Премиум
+                    'start_date': date.today() - timedelta(days=30),
+                    'end_date': date.today() + timedelta(days=150),
+                    'is_active': True
+                },
+                {
+                    'client': clients[1],
+                    'membership_type': membership_types[1],  # Стандарт
+                    'start_date': date.today() - timedelta(days=15),
+                    'end_date': date.today() + timedelta(days=75),
+                    'is_active': True
+                },
+                {
+                    'client': clients[2],
+                    'membership_type': membership_types[3],  # VIP
+                    'start_date': date.today() - timedelta(days=60),
+                    'end_date': date.today() + timedelta(days=305),
+                    'is_active': True
+                },
+                {
+                    'client': clients[3],
+                    'membership_type': membership_types[0],  # Базовый
+                    'start_date': date.today() - timedelta(days=5),
+                    'end_date': date.today() + timedelta(days=25),
+                    'is_active': True
+                },
+                {
+                    'client': clients[4],
+                    'membership_type': membership_types[1],  # Стандарт
+                    'start_date': date.today() - timedelta(days=45),
+                    'end_date': date.today() + timedelta(days=45),
+                    'is_active': True
+                }
+            ]
+            for data in memberships_data:
+                Membership.objects.create(**data)
+            self.stdout.write(self.style.SUCCESS('[OK] Абонементы созданы'))
+
+        # Тренировки
+        if not Training.objects.exists() and TrainingType.objects.exists() and Trainer.objects.exists() and Hall.objects.exists():
+            training_types = list(TrainingType.objects.all())
+            trainers = list(Trainer.objects.all())
+            halls = list(Hall.objects.all())
+            clients = list(Client.objects.all())
+
+            trainings_data = [
+                {
+                    'training_type': training_types[0],  # Силовая
+                    'trainers': [trainers[0]],
+                    'hall': halls[0],
+                    'date': date.today() + timedelta(days=1),
+                    'time': time(10, 0),
+                    'participants': [clients[0], clients[2]]
+                },
+                {
+                    'training_type': training_types[1],  # Йога
+                    'trainers': [trainers[1]],
+                    'hall': halls[1],
+                    'date': date.today() + timedelta(days=1),
+                    'time': time(18, 0),
+                    'participants': [clients[1], clients[3]]
+                },
+                {
+                    'training_type': training_types[2],  # HIIT
+                    'trainers': [trainers[2]],
+                    'hall': halls[2],
+                    'date': date.today() + timedelta(days=2),
+                    'time': time(19, 0),
+                    'participants': [clients[0], clients[4]]
+                },
+                {
+                    'training_type': training_types[3],  # Пилатес
+                    'trainers': [trainers[1]],
+                    'hall': halls[1],
+                    'date': date.today() + timedelta(days=3),
+                    'time': time(17, 0),
+                    'participants': [clients[1], clients[2], clients[3]]
+                },
+                {
+                    'training_type': training_types[4],  # Кроссфит
+                    'trainers': [trainers[0], trainers[2]],
+                    'hall': halls[2],
+                    'date': date.today() + timedelta(days=4),
+                    'time': time(20, 0),
+                    'participants': [clients[0], clients[2], clients[4]]
+                }
+            ]
+            for data in trainings_data:
+                trainers_list = data.pop('trainers')
+                participants_list = data.pop('participants')
+                training = Training.objects.create(**data)
+                training.trainers.set(trainers_list)
+                training.participants.set(participants_list)
+            self.stdout.write(self.style.SUCCESS('[OK] Тренировки созданы'))
+
+        # Отзывы
+        if not Review.objects.exists() and Client.objects.exists() and Trainer.objects.exists():
+            clients = list(Client.objects.all())
+            trainers = list(Trainer.objects.all())
+
+            reviews_data = [
+                {
+                    'client': clients[0],
+                    'trainer': trainers[0],
+                    'rating': 5,
+                    'text': 'Отличный тренер! Помог составить программу тренировок и следит за техникой выполнения упражнений.'
+                },
+                {
+                    'client': clients[1],
+                    'trainer': trainers[1],
+                    'rating': 5,
+                    'text': 'Анна - замечательный инструктор по йоге. После занятий чувствую себя обновленной!'
+                },
+                {
+                    'client': clients[2],
+                    'trainer': None,
+                    'rating': 4,
+                    'text': 'Хороший зал, современное оборудование. Единственный минус - иногда много людей в вечернее время.'
+                },
+                {
+                    'client': clients[3],
+                    'trainer': trainers[1],
+                    'rating': 5,
+                    'text': 'Очень довольна занятиями пилатесом. Результаты видны уже через месяц!'
+                },
+                {
+                    'client': clients[4],
+                    'trainer': trainers[2],
+                    'rating': 4,
+                    'text': 'Интенсивные тренировки с Дмитрием дают отличный результат. Рекомендую!'
+                }
+            ]
+            for data in reviews_data:
+                Review.objects.create(**data)
+            self.stdout.write(self.style.SUCCESS('[OK] Отзывы созданы'))
+
+        # Промокоды
+        if not Promocode.objects.exists() and MembershipType.objects.exists():
+            admin_user = User.objects.filter(is_superuser=True).first()
+            membership_types = list(MembershipType.objects.all())
+
+            promocodes_data = [
+                {
+                    'code': 'WELCOME2024',
+                    'discount_percent': 15,
+                    'membership_type': membership_types[0],  # Базовый
+                    'created_by': admin_user,
+                    'is_active': True,
+                    'valid_until': date.today() + timedelta(days=90)
+                },
+                {
+                    'code': 'SUMMER30',
+                    'discount_percent': 30,
+                    'membership_type': membership_types[2],  # Премиум
+                    'created_by': admin_user,
+                    'is_active': True,
+                    'valid_until': date.today() + timedelta(days=60)
+                },
+                {
+                    'code': 'VIP50',
+                    'discount_percent': 50,
+                    'membership_type': membership_types[3],  # VIP
+                    'created_by': admin_user,
+                    'is_active': True,
+                    'valid_until': date.today() + timedelta(days=30)
+                },
+                {
+                    'code': 'NEWYEAR',
+                    'discount_percent': 20,
+                    'membership_type': None,  # Для всех типов
+                    'created_by': admin_user,
+                    'is_active': False,
+                    'valid_until': date.today() - timedelta(days=30)
+                }
+            ]
+            for data in promocodes_data:
+                Promocode.objects.create(**data)
+            self.stdout.write(self.style.SUCCESS('[OK] Промокоды созданы'))
+
         self.stdout.write(self.style.SUCCESS('\n[SUCCESS] Все тестовые данные успешно загружены!'))
         self.stdout.write(self.style.WARNING('\nДля входа в админ-панель используйте:'))
         self.stdout.write('Username: admin')
         self.stdout.write('Password: admin (установите пароль командой: python manage.py changepassword admin)')
+        self.stdout.write(self.style.WARNING('\nДля входа как клиент используйте:'))
+        self.stdout.write('Username: client1, client2, client3, client4, client5')
+        self.stdout.write('Password: client123')
