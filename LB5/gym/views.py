@@ -1,7 +1,6 @@
 import base64
 import io
 from datetime import date, timedelta
-from decimal import Decimal
 
 import matplotlib
 
@@ -13,10 +12,9 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
-from django.utils import timezone
 
 from .forms import (
     RegisterForm, MembershipForm,
@@ -24,7 +22,7 @@ from .forms import (
 )
 from .models import (
     Client, Trainer, Membership, MembershipType, Training, TrainingType,
-    Review, Equipment, FAQ, Article, Vacancy, CompanyInfo, UserSessionLog, Promocode
+    Review, Equipment, FAQ, Article, Vacancy, CompanyInfo, UserSessionLog
 )
 
 
