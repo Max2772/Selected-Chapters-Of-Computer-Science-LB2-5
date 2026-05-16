@@ -29,8 +29,8 @@ class RegisterForm(UserCreationForm):
         birth_date = self.cleaned_data['birth_date']
         today = date.today()
         age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-        if age < 16:
-            raise forms.ValidationError("Регистрация только для пользователей старше 16 лет.")
+        if age < 18:
+            raise forms.ValidationError("Регистрация только для пользователей старше 18 лет.")
         return birth_date
 
     def clean_phone(self):

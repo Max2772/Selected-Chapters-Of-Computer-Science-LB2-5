@@ -206,6 +206,8 @@ def buy_membership_view(request):
     except Client.DoesNotExist:
         return HttpResponseForbidden("Вы не зарегистрированы как клиент.")
 
+    membership_types = MembershipType.objects.all()
+
     if request.method == 'POST':
         form = MembershipForm(request.POST)
         if form.is_valid():
@@ -225,7 +227,14 @@ def buy_membership_view(request):
     else:
         form = MembershipForm()
 
-    return render(request, 'gym/buy_membership.html', {'form': form})
+    return render(
+        request,
+        'gym/buy_membership.html',
+        {
+            'form': form,
+            'membership_types': membership_types
+         }
+    )
 
 
 @login_required
