@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -129,9 +130,11 @@ def training_detail_view(request, pk):
 
 def memberships_view(request):
     membership_types = MembershipType.objects.all()
-    return render(request, 'gym/memberships.html', {
-        'membership_types': membership_types
-    })
+    return render(
+        request,
+        'gym/memberships.html',
+        {'membership_types': membership_types}
+    )
 
 
 def equipment_view(request):
