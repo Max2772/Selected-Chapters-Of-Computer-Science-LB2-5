@@ -1,20 +1,25 @@
 import base64
 import io
+import json
+import logging
+import statistics as stats_module
+from collections import Counter
 from datetime import date, timedelta
 
 import matplotlib
-
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
+import requests
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count
-from django.http import HttpResponseForbidden
+from django.db.models import Count, Q
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 
 from .forms import (
     RegisterForm, MembershipForm,
@@ -24,6 +29,9 @@ from .models import (
     Client, Trainer, Membership, MembershipType, Training, TrainingType,
     Review, Equipment, FAQ, Article, Vacancy, CompanyInfo, UserSessionLog
 )
+
+logger = logging.getLogger('gym')
+
 
 
 def main_view(request):
@@ -94,6 +102,8 @@ def trainer_detail_view(request, pk):
 def trainings_view(request):
     difficulty = request.GET.get('difficulty', '')
     type_filter = request.GET.get('type', '')
+    search_query = request.GET.get('q', '')
+    sort_by = request.GET.get('sort', '')
 
     training_types = TrainingType.objects.all()
 
@@ -103,10 +113,30 @@ def trainings_view(request):
     if type_filter:
         training_types = training_types.filter(type=type_filter)
 
+    if search_query:
+        training_types = training_types.filter(
+            Q(name__icontains=search_query) | Q(description__icontains=search_query)
+        )
+
+    sort_options = {
+        'name': 'name',
+        'name_desc': '-name',
+        'duration': 'duration_minutes',
+        'duration_desc': '-duration_minutes',
+        'participants': 'max_participants',
+        'participants_desc': '-max_participants',
+    }
+    if sort_by in sort_options:
+        training_types = training_types.order_by(sort_options[sort_by])
+
+    logger.info("Trainings page accessed: query=%s, sort=%s", search_query, sort_by)
+
     return render(request, 'gym/trainings.html', {
         'trainings': training_types,
         'difficulty': difficulty,
         'type_filter': type_filter,
+        'search_query': search_query,
+        'sort_by': sort_by,
         'type_choices': TrainingType.TrainingCategory.choices,
         'difficulty_choices': TrainingType.DifficultyLevel.choices
     })
@@ -155,7 +185,7 @@ def register_view(request):
                 birth_date=form.cleaned_data["birth_date"]
             )
             login(request, user)
-            return redirect("select_trainer")
+            return redirect("profile")
     else:
         form = RegisterForm()
     return render(request, "gym/register.html", {"form": form})
@@ -314,8 +344,8 @@ def trainer_dashboard_view(request):
     except Trainer.DoesNotExist:
         return HttpResponseForbidden("Вы не являетесь тренером.")
 
-    trainings = Training.objects.filter(trainer=trainer).order_by('-date', '-time')
-    clients = Client.objects.filter(trainer=trainer)
+    trainings = Training.objects.filter(trainers=trainer).order_by('-date', '-time')
+    clients = Client.objects.filter(trainings__trainers=trainer).distinct()
 
     return render(request, 'gym/trainer_dashboard.html', {
         'trainer': trainer,
@@ -337,13 +367,38 @@ def statistics_view(request):
     df = pd.DataFrame(data)
     if df.empty:
         average = 0
+        median_val = 0
+        mode_val = 0
     else:
-        average = df['duration_minutes'].mean()
+        durations = df['duration_minutes'].tolist()
+        average = stats_module.mean(durations)
+        median_val = stats_module.median(durations)
+        try:
+            mode_val = stats_module.mode(durations)
+        except stats_module.StatisticsError:
+            mode_val = durations[0] if durations else 0
+
+    # Membership price statistics
+    membership_prices = list(
+        Membership.objects.values_list('membership_type__price', flat=True)
+    )
+    if membership_prices:
+        prices_float = [float(p) for p in membership_prices]
+        price_mean = stats_module.mean(prices_float)
+        price_median = stats_module.median(prices_float)
+        try:
+            price_mode = stats_module.mode(prices_float)
+        except stats_module.StatisticsError:
+            price_mode = prices_float[0]
+    else:
+        price_mean = price_median = price_mode = 0
 
     plt.figure(figsize=(10, 6))
     if not df.empty:
         plt.bar(df['user'], df['duration_minutes'], color='skyblue', label='Пользователь')
         plt.axhline(y=average, color='red', linestyle='--', label=f'Среднее: {average:.1f} мин')
+        plt.axhline(y=median_val, color='green', linestyle='-.', label=f'Медиана: {median_val:.1f} мин')
+        plt.axhline(y=mode_val, color='orange', linestyle=':', label=f'Мода: {mode_val:.1f} мин')
     plt.title('Время, проведённое пользователями на сайте')
     plt.ylabel('Минуты')
     plt.xlabel('Пользователи')
@@ -357,7 +412,17 @@ def statistics_view(request):
     buf.close()
     plt.close()
 
-    return render(request, 'gym/statistics.html', {'chart_data': chart_data})
+    logger.info("Statistics page accessed by user %s", request.user.username)
+
+    return render(request, 'gym/statistics.html', {
+        'chart_data': chart_data,
+        'average': round(average, 2),
+        'median_val': round(median_val, 2),
+        'mode_val': round(mode_val, 2),
+        'price_mean': round(price_mean, 2),
+        'price_median': round(price_median, 2),
+        'price_mode': round(price_mode, 2),
+    })
 
 
 @staff_member_required
@@ -458,3 +523,51 @@ def client_cost_report(request):
     return render(request, 'gym/reports/client_cost.html', {
         'client_costs': client_costs
     })
+
+
+def weather_api_view(request):
+    """Внешний API #1 — погода в Минске (wttr.in)"""
+    try:
+        resp = requests.get(
+            'https://wttr.in/Minsk?format=j1',
+            timeout=5,
+            headers={'Accept-Language': 'ru'}
+        )
+        resp.raise_for_status()
+        weather_data = resp.json()
+        current = weather_data.get('current_condition', [{}])[0]
+        result = {
+            'temp_c': current.get('temp_C', 'N/A'),
+            'feels_like': current.get('FeelsLikeC', 'N/A'),
+            'humidity': current.get('humidity', 'N/A'),
+            'description': current.get('lang_ru', [{}])[0].get('value', current.get('weatherDesc', [{}])[0].get('value', '')),
+            'wind_speed': current.get('windspeedKmph', 'N/A'),
+        }
+        logger.info("Weather API called successfully")
+        return JsonResponse({'status': 'ok', 'weather': result})
+    except Exception as e:
+        logger.error("Weather API error: %s", str(e))
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=502)
+
+
+def quote_api_view(request):
+    """Внешний API #2 — мотивационная цитата (zenquotes.io)"""
+    try:
+        resp = requests.get('https://zenquotes.io/api/random', timeout=5)
+        resp.raise_for_status()
+        data = resp.json()
+        if data and len(data) > 0:
+            result = {
+                'quote': data[0].get('q', ''),
+                'author': data[0].get('a', ''),
+            }
+        else:
+            result = {'quote': 'Никогда не сдавайся!', 'author': 'FitLife Gym'}
+        logger.info("Quote API called successfully")
+        return JsonResponse({'status': 'ok', 'quote': result})
+    except Exception as e:
+        logger.error("Quote API error: %s", str(e))
+        return JsonResponse({
+            'status': 'ok',
+            'quote': {'quote': 'Сила — в движении!', 'author': 'FitLife Gym'}
+        })

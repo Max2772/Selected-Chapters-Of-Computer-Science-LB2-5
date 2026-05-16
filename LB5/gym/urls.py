@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
@@ -7,12 +7,13 @@ urlpatterns = [
     path('contacts/', views.contacts_view, name='contacts'),
     path('faq/', views.faq_view, name='faq'),
     path('news/', views.news_view, name='news'),
-    path('news/<int:pk>/', views.news_detail_view, name='news_detail'),
+    # re_path с регулярным выражением для новости (требование — использовать re_path)
+    re_path(r'^news/(?P<pk>[0-9]+)/$', views.news_detail_view, name='news_detail'),
     path('privacy/', views.privacy_policy_view, name='privacy_policy'),
     path('vacancies/', views.vacancies_view, name='vacancies'),
 
     path('trainers/', views.trainers_view, name='trainers'),
-    path('trainers/<int:pk>/', views.trainer_detail_view, name='trainer_detail'),
+    re_path(r'^trainers/(?P<pk>[0-9]+)/$', views.trainer_detail_view, name='trainer_detail'),
 
     path('trainings/', views.trainings_view, name='trainings'),
     path('trainings/<int:pk>/', views.training_detail_view, name='training_detail'),
@@ -41,4 +42,8 @@ urlpatterns = [
     path('reports/training-group/', views.training_group_report, name='training_group_report'),
     path('reports/training-count/', views.training_count_report, name='training_count_report'),
     path('reports/client-cost/', views.client_cost_report, name='client_cost_report'),
+
+    # Внешние API
+    path('api/weather/', views.weather_api_view, name='api_weather'),
+    path('api/quote/', views.quote_api_view, name='api_quote'),
 ]

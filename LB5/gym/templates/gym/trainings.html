@@ -243,7 +243,16 @@
     <!-- Filter Section -->
     <div class="filter-section">
         <form method="get" class="row g-3">
-            <div class="col-md-6">
+            <div class="col-md-12">
+                <label for="q" class="form-label">
+                    <i class="fas fa-search"></i> Поиск по названию или описанию
+                </label>
+                <input type="text" name="q" id="q" class="form-control"
+                       placeholder="Введите название или описание..."
+                       value="{{ search_query }}"
+                       style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,69,0,0.2); color: var(--text-light); padding: 12px 20px; border-radius: 10px;">
+            </div>
+            <div class="col-md-4">
                 <label for="type" class="form-label">
                     <i class="fas fa-filter"></i> Тип тренировки
                 </label>
@@ -254,7 +263,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label for="difficulty" class="form-label">
                     <i class="fas fa-chart-line"></i> Сложность
                 </label>
@@ -263,6 +272,20 @@
                     {% for value, label in difficulty_choices %}
                     <option value="{{ value }}" {% if difficulty == value %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="sort" class="form-label">
+                    <i class="fas fa-sort"></i> Сортировка
+                </label>
+                <select name="sort" id="sort" class="form-select">
+                    <option value="">По умолчанию</option>
+                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Название (А-Я)</option>
+                    <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>Название (Я-А)</option>
+                    <option value="duration" {% if sort_by == 'duration' %}selected{% endif %}>Длительность (↑)</option>
+                    <option value="duration_desc" {% if sort_by == 'duration_desc' %}selected{% endif %}>Длительность (↓)</option>
+                    <option value="participants" {% if sort_by == 'participants' %}selected{% endif %}>Участников (↑)</option>
+                    <option value="participants_desc" {% if sort_by == 'participants_desc' %}selected{% endif %}>Участников (↓)</option>
                 </select>
             </div>
             <div class="col-md-12">

@@ -157,3 +157,82 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    const form = document.querySelector('form');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+        let errors = [];
+
+        // Phone validation (+375)
+        const phoneInput = document.getElementById('id_phone');
+        if (phoneInput) {
+            const phone = phoneInput.value.replace(/\D/g, '');
+            const validOps = ['29', '33', '44', '25'];
+            let valid = false;
+            if (phone.length === 12 && phone.startsWith('375')) {
+                valid = validOps.includes(phone.substring(3, 5));
+            } else if (phone.length === 9) {
+                valid = validOps.includes(phone.substring(0, 2));
+            }
+            if (!valid) {
+                errors.push('Телефон: введите номер в формате +375 29 1234567');
+                phoneInput.style.borderColor = '#f87171';
+            } else {
+                phoneInput.style.borderColor = '';
+            }
+        }
+
+        // Age validation (18+)
+        const birthInput = document.getElementById('id_birth_date');
+        if (birthInput && birthInput.value) {
+            const bd = new Date(birthInput.value);
+            const today = new Date();
+            let age = today.getFullYear() - bd.getFullYear();
+            const m = today.getMonth() - bd.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+            if (age < 18) {
+                errors.push('Возраст: регистрация только для пользователей старше 18 лет');
+                birthInput.style.borderColor = '#f87171';
+            } else {
+                birthInput.style.borderColor = '';
+            }
+        }
+
+        // Email format
+        const emailInput = document.getElementById('id_email');
+        if (emailInput && emailInput.value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value)) {
+                errors.push('Email: введите корректный email адрес');
+                emailInput.style.borderColor = '#f87171';
+            } else {
+                emailInput.style.borderColor = '';
+            }
+        }
+
+        // Password match
+        const pw1 = document.getElementById('id_password1');
+        const pw2 = document.getElementById('id_password2');
+        if (pw1 && pw2 && pw1.value && pw2.value && pw1.value !== pw2.value) {
+            errors.push('Пароли не совпадают');
+            pw2.style.borderColor = '#f87171';
+        }
+
+        if (errors.length > 0) {
+            e.preventDefault();
+            let existing = form.querySelector('.client-validation-errors');
+            if (existing) existing.remove();
+            const div = document.createElement('div');
+            div.className = 'alert alert-danger client-validation-errors';
+            div.innerHTML = '<strong><i class="fas fa-exclamation-triangle"></i> Ошибки валидации:</strong><ul style="margin-bottom:0">' +
+                errors.map(err => '<li>' + err + '</li>').join('') + '</ul>';
+            form.insertBefore(div, form.firstChild);
+        }
+    });
+})();
+</script>
+{% endblock %}
